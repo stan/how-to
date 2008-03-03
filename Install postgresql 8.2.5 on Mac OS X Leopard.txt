@@ -1,0 +1,52 @@
+Download and install MacPorts 1.5.0-10.5.dmg http://svn.macosforge.org/repository/macports/downloads/MacPorts-1.5.0/
+Open new terminal
+
+sudo port -v selfupdate
+sudo port -v install postgresql82 postgresql82-server
+
+--- fails ---
+
+cd ~/Downloads
+curl -o postgresql-8.2.5.tar.bz2 http://ftp3.jp.postgresql.org/pub/db/postgresql//source/v8.2.5/postgresql-8.2.5.tar.bz2
+curl -o postgresql-8.2.5-fixosxdtrace.diff.gz http://leenux.org.uk/wp-content/uploads/2007/10/postgresql-825-fixosxdtracediff.gz
+gunzip postgresql-8.2.5-fixosxdtrace.diff.gz
+
+cd /opt/local/var/macports/build/_opt_local_var_macports_sources_rsync.macports.org_release_ports_databases_postgresql82/work/postgresql-8.2.5
+cat ~/Downloads/postgresql-8.2.5-fixosxdtrace.diff | patch -p1 (answer y at all questions)
+
+sudo tar xjvf ~/Downloads/postgresql-8.2.5.tar.bz2
+sudo cp -r postgresql-8.2.5/src/ src/
+sudo ./configure --sysconfdir=/opt/local/etc/postgresql82 --bindir=/opt/local/lib/postgresql82/bin --libdir=/opt/local/lib/postgresql82 --includedir=/opt/local/include/postgresql82 --datadir=/opt/local/share/postgresql82 --mandir=/opt/local/share/man --without-docdir --with-includes=/opt/local/include --with-libraries=/opt/local/lib --with-openssl --with-bonjour --with-readline --with-zlib --enable-thread-safety --enable-integer-datetimes --enable-dtrace
+sudo make
+
+--- fails again (coz of dtrace -G) ---
+sudo cp -r postgresql-8.2.5/src/ src/
+cat ~/Downloads/postgresql-8.2.5-fixosxdtrace.diff | patch -p1
+sudo ./configure --sysconfdir=/opt/local/etc/postgresql82 --bindir=/opt/local/lib/postgresql82/bin --libdir=/opt/local/lib/postgresql82 --includedir=/opt/local/include/postgresql82 --datadir=/opt/local/share/postgresql82 --mandir=/opt/local/share/man --without-docdir --with-includes=/opt/local/include --with-libraries=/opt/local/lib --with-openssl --with-bonjour --with-readline --with-zlib --enable-thread-safety --enable-integer-datetimes --enable-dtrace
+sudo make
+
+cd ~
+sudo port install postgresql82 postgresql82-server
+
+OK!
+
+sudo mkdir -p /opt/local/var/db/postgresql82/defaultdb
+sudo chown postgres:postgres /opt/local/var/db/postgresql82/defaultdb
+sudo su postgres -c '/opt/local/lib/postgresql82/bin/initdb -D /opt/local/var/db/postgresql82/defaultdb'
+
+sudo launchctl load -w /Library/LaunchDaemons/org.macports.postgresql82-server.plist
+
+Success. You can now start the database server using:
+
+    /opt/local/lib/postgresql82/bin/postgres -D /opt/local/var/db/postgresql82/defaultdb
+or
+    /opt/local/lib/postgresql82/bin/pg_ctl -D /opt/local/var/db/postgresql82/defaultdb -l logfile start
+
+	/System/Library/Frameworks/ScreenSaver.framework/Resources/ScreenSaverEngine.app/Contents/MacOS/ScreenSaverEngine -background &
+
+
+
+http://leenux.org.uk/dtrace-patches/dtrace-with-postgres-on-osx/
+http://mel.icious.net/blog/2007/11/13/installing-postgresql-825-on-leopard/
+http://www.gelens.org/2007/10/29/postgresql_in_leopard_using_ma
+http://blog.invisible.ch/2007/10/28/rails-stack-on-leopard/

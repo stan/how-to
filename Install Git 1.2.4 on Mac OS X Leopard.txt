@@ -1,0 +1,52 @@
+# build expat dependency
+curl -O http://surfnet.dl.sourceforge.net/sourceforge/expat/expat-2.0.1.tar.gz
+tar xzvf expat-2.0.1.tar.gz
+cd expat-2.0.1
+./configure
+make
+make check
+sudo make install
+cd ..
+
+# git
+curl -O http://kernel.org/pub/software/scm/git/git-1.5.4.tar.bz2
+tar jxvf git-1.5.4.tar.bz2
+cd git-1.5.4
+make prefix=/usr/local all
+make prefix=/usr/local test && echo $?
+sudo make prefix=/usr/local install
+cd ..
+
+# man
+curl -O http://www.kernel.org/pub/software/scm/git/git-manpages-1.5.4.tar.bz2
+sudo tar xjv -C /usr/local/man -f git-manpages-1.5.4.tar.bz2
+
+# personalize these with your own name and email address
+git config --global user.name "Stanislas Mazurek"
+git config --global user.email "xxxxxxxx@mac.com"
+
+# colorize output
+git config --global color.status auto
+git config --global color.diff auto
+git config --global color.branch auto
+
+# shortcut aliases
+git config --global alias.st status
+git config --global alias.ci commit
+git config --global alias.co checkout
+
+# use Apple opendiff (FileMerge) for resolving conflicts
+git config --global merge.tool opendiff
+
+# set up a global ignores file
+git config --global core.excludesfile ~/.gitignore
+echo ".DS_Store" >> ~/.gitignore
+
+# a basic .gitk file
+cat > ~/.gitk <
+set mainfont {Monaco 10}
+set textfont {Monaco 10}
+set uifont {Monaco 10}
+EOF
+
+from http://wincent.com/knowledge-base/Installing_Git_1.5.2.4_on_Mac_OS_X_Leopard

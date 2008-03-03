@@ -1,0 +1,49 @@
+
+curl -O http://mysql.he.net/Downloads/MySQL-5.0/mysql-5.0.45.tar.gz
+tar xzvf mysql-5.0.45.tar.gz
+cd mysql-5.0.45
+
+CC=gcc CFLAGS="-O3 -fno-omit-frame-pointer" CXX=gcc \
+CXXFLAGS="-O3 -fno-omit-frame-pointer -felide-constructors \
+-fno-exceptions -fno-rtti" \
+./configure --prefix=/opt/mysql \
+--with-extra-charsets=complex --enable-thread-safe-client \
+--enable-local-infile --enable-shared
+
+make
+
+sudo make install
+
+com.mysql.mysqld.plist =>
+
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>KeepAlive</key>
+    <true/>
+    <key>Label</key>
+    <string>com.mysql.mysqld</string>
+    <key>Program</key>
+    <string>/opt/mysql/bin/mysqld_safe</string>
+    <key>RunAtLoad</key>
+    <true/>
+    <key>UserName</key>
+    <string>mysql</string>
+    <key>WorkingDirectory</key>
+    <string>/opt/mysql</string>
+</dict>
+</plist>
+
+sudo mv ~/Desktop/com.mysql.mysqld.plist /Library/LaunchDaemons
+sudo chown root /Library/LaunchDaemons/com.mysql.mysqld.plist
+
+sudo launchctl load -w /Library/LaunchDaemons/com.mysql.mysqld.plist (start it)
+sudo launchctl unload -w /Library/LaunchDaemons/com.mysql.mysqld.plist (stop it)
+
+MySQL C bindings for Ruby
+
+sudo env ARCHFLAGS="-arch i386" gem install mysql -- --with-mysql-config=/opt/mysql/bin/mysql_config
+
+
+
